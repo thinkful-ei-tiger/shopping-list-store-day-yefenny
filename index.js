@@ -39,21 +39,21 @@ const generateShoppingItemsString = function (shoppingList) {
  * Render the shopping list in the DOM
  */
 const render = function () {
-  // Set up a copy of the store's items in a local 
+  // Set up a copy of the store's items in a local
   // variable 'items' that we will reassign to a new
   // version if any filtering of the list occurs.
   let items = [...store.items];
-  // If the `hideCheckedItems` property is true, 
-  // then we want to reassign filteredItems to a 
-  // version where ONLY items with a "checked" 
+  // If the `hideCheckedItems` property is true,
+  // then we want to reassign filteredItems to a
+  // version where ONLY items with a "checked"
   // property of false are included.
   if (store.hideCheckedItems) {
-    items = items.filter(item => !item.checked);
+    items = items.filter((item) => !item.checked);
   }
 
   /**
-   * At this point, all filtering work has been 
-   * done (or not done, if that's the current settings), 
+   * At this point, all filtering work has been
+   * done (or not done, if that's the current settings),
    * so we send our 'items' into our HTML generation function
    */
   const shoppingListItemsString = generateShoppingItemsString(items);
@@ -77,12 +77,12 @@ const handleNewItemSubmit = function () {
 };
 
 const toggleCheckedForListItem = function (id) {
-  const foundItem = store.items.find(item => item.id === id);
+  const foundItem = store.items.find((item) => item.id === id);
   foundItem.checked = !foundItem.checked;
 };
 
 const handleItemCheckClicked = function () {
-  $('.js-shopping-list').on('click', '.js-item-toggle', event => {
+  $('.js-shopping-list').on('click', '.js-item-toggle', (event) => {
     const id = getItemIdFromElement(event.currentTarget);
     toggleCheckedForListItem(id);
     render();
@@ -90,34 +90,32 @@ const handleItemCheckClicked = function () {
 };
 
 const getItemIdFromElement = function (item) {
-  return $(item)
-    .closest('.js-item-element')
-    .data('item-id');
+  return $(item).closest('.js-item-element').data('item-id');
 };
 
 /**
  * Responsible for deleting a list item.
- * @param {string} id 
+ * @param {string} id
  */
 const deleteListItem = function (id) {
-  // As with 'addItemToShoppingLIst', this 
+  // As with 'addItemToShoppingLIst', this
   // function also has the side effect of
   // mutating the global store value.
   //
-  // First we find the index of the item with 
+  // First we find the index of the item with
   // the specified id using the native
-  // Array.prototype.findIndex() method. 
-  const index = store.items.findIndex(item => item.id === id);
-  // Then we call `.splice` at the index of 
-  // the list item we want to remove, with 
+  // Array.prototype.findIndex() method.
+  const index = store.items.findIndex((item) => item.id === id);
+  // Then we call `.splice` at the index of
+  // the list item we want to remove, with
   // a removeCount of 1.
   store.items.splice(index, 1);
 };
 
 const handleDeleteItemClicked = function () {
-  // Like in `handleItemCheckClicked`, 
+  // Like in `handleItemCheckClicked`,
   // we use event delegation.
-  $('.js-shopping-list').on('click', '.js-item-delete', event => {
+  $('.js-shopping-list').on('click', '.js-item-delete', (event) => {
     // Get the index of the item in store.items.
     const id = getItemIdFromElement(event.currentTarget);
     // Delete the item.
@@ -135,7 +133,7 @@ const toggleCheckedItemsFilter = function () {
 };
 
 /**
- * Places an event listener on the checkbox 
+ * Places an event listener on the checkbox
  * for hiding completed items.
  */
 const handleToggleFilterClick = function () {
@@ -146,12 +144,38 @@ const handleToggleFilterClick = function () {
 };
 
 /**
+ *On double click make string editable
+ */
+
+const handleDblClickItemName = function () {
+  $('.js-shopping-list').on('dblclick', '.shopping-item', (evt) => {
+    console.log();
+    let x = 1;
+    $(evt.currentTarget).html(
+      `<form class='js-new-name-form'><input class='js-edited-name' type = 'text' value='${$(
+        evt.currentTarget
+      ).text()}' > </form>`
+    );
+  });
+};
+
+const updateItemName = function () {
+  $('.js-shopping-list').on('submit', '.js-new-name-form', function (evt) {
+    evt.preventDefault();
+    let id = getItemIdFromElement(this);
+    let item = store.items.find((item) => item.id === id);
+    item.name = $('.js-edited-name').val();
+    render();
+  });
+};
+
+/**
  * This function will be our callback when the
- * page loads. It is responsible for initially 
- * rendering the shopping list, then calling 
- * our individual functions that handle new 
- * item submission and user clicks on the 
- * "check" and "delete" buttons for individual 
+ * page loads. It is responsible for initially
+ * rendering the shopping list, then calling
+ * our individual functions that handle new
+ * item submission and user clicks on the
+ * "check" and "delete" buttons for individual
  * shopping list items.
  */
 const handleShoppingList = function () {
@@ -160,6 +184,8 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleDblClickItemName();
+  updateItemName();
 };
 
 // when the page loads, call `handleShoppingList`
